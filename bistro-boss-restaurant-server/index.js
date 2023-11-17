@@ -5,7 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const jsonwebtoken = require('jsonwebtoken');
 require('dotenv').config()
-
+const cookieParser = require('cookie-parser');
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -15,6 +15,7 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+app.use(cookieParser());
 
 const uri = `mongodb+srv://${process.env.milestone12_USER}:${process.env.milestone12_PASS}@projects.mqfabmq.mongodb.net/${bistroBoss}?retryWrites=true&w=majority`;
 
@@ -23,17 +24,20 @@ const uri = `mongodb+srv://${process.env.milestone12_USER}:${process.env.milesto
 
 const verifyToken = async (req, res, next) => {
     try {
-        const token = req.cookies?.token;
+        console.log('the token to be verified: ', req?.cookies);
+        const token = req?.cookies?.[ "bistro-boss-token" ];
 
-        console.log('the token to be verified: ', token);
 
         if (!token) return res.status(401).send({ message: 'Unauthorized access' })
 
         jsonwebtoken.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
             // console.log(err);
-            if (err) return res.status(401).send({ message: 'You are not authorized' })
+            if (err) {
+                console.log(err);
+                return res.status(401).send({ message: 'You are not authorized' })
+            }
 
-            // console.log(decoded);
+            console.log(decoded);
             req.user = decoded;
             next();
         })
@@ -59,16 +63,11 @@ const setTokenCookie = async (req, res, next) => {
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
 
             })
-        req.token = token;
-        // req.cookie
+        req[ "bistro-boss-token" ] = token;
+        console.log(req[ "bistro-boss-token" ]);
         next();
     }
 }
-
-
-
-
-
 
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -92,11 +91,10 @@ async function run() {
         /* Auth api */
         app.post('/auth/jwt', setTokenCookie, (req, res) => {
             try {
-                const user = req.body;
-                const { token } = req;
+                const token = req[ "bistro-boss-token" ];
 
-                console.log('The user: ', user);
-                console.log('token in cookie: ', token);
+                // console.log('The user: ', user);
+                // console.log('token in cookie: ', token);
 
                 if (!token) return res.status(400).send({ success: false, message: 'Cookie set failed' })
                 res.send({ success: true })
@@ -118,12 +116,12 @@ async function run() {
             }
         })
 
-        app.get('/users', async (req, res) => {
+        app.get('/users', verifyToken, async (req, res) => {
             const result = await userCollection.find().toArray();
             res.send(result)
         })
 
-        app.delete('/users/:id', async (req, res) => {
+        app.delete('/users/:id', verifyToken, async (req, res) => {
             const { id } = req.params;
             const query = { _id: new ObjectId(id) }
 
@@ -132,7 +130,7 @@ async function run() {
             res.send(result)
         })
 
-        app.patch('/users/admin/:id', async (req, res) => {
+        app.patch('/users/admin/:id', verifyToken, async (req, res) => {
             const { id } = req.params;
 
             const query = { _id: new ObjectId(id) }
@@ -203,7 +201,7 @@ async function run() {
                 res.status(500).send({ message: error?.message })
             }
         })
-        app.delete('/carts/:id', async (req, res) => {
+        app.delete('/carts/:id', verifyToken, async (req, res) => {
             try {
                 const { id } = req.params;
 

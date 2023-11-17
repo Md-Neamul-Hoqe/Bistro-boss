@@ -9,6 +9,7 @@ import Credentials from "../pages/Credentials/Credentials";
 import Dashboard from "../Dashboard";
 import Cart from "../pages/Dashboard/Cart/Cart";
 import AllUsers from "../pages/Dashboard/AllUsers/AllUsers";
+import PrivateRoutes from "./PrivateRoutes";
 
 export const router = createBrowserRouter([
   {
@@ -95,7 +96,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "all-users",
-        element: <AllUsers />,
+        element: (
+          <PrivateRoutes>
+            <AllUsers />
+          </PrivateRoutes>
+        ),
       },
     ],
   },

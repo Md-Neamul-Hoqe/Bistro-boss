@@ -52,6 +52,7 @@ const AuthProvider = ({ children }) => {
         try {
           axios.post("/auth/jwt", userInfo).then((res) => {
             console.log(res?.data);
+            setLoading(false);
           });
         } catch (error) {
           console.log(error);
