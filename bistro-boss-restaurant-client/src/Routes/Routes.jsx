@@ -11,6 +11,9 @@ import Cart from "../pages/Dashboard/Cart/Cart";
 import AllUsers from "../pages/Dashboard/AllUsers/AllUsers";
 import AdminRoute from "./AdminRoute";
 import PrivateRoutes from "./PrivateRoutes";
+import AdminHome from "../pages/Dashboard/AdminHome/AdminHome";
+import UserHome from "../pages/Dashboard/UserHome/UserHome";
+import AddItem from "../pages/Dashboard/AddItem/AddItem";
 
 export const router = createBrowserRouter([
   {
@@ -59,7 +62,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "user-home",
-        element: <Cart />,
+        element: <UserHome />,
       },
       {
         path: "reservation",
@@ -87,15 +90,15 @@ export const router = createBrowserRouter([
         path: "admin-home",
         element: (
           <AdminRoute>
-            <Cart />
+            <AdminHome />
           </AdminRoute>
         ),
       },
       {
-        path: "add-times",
+        path: "add-item",
         element: (
           <AdminRoute>
-            <Cart />
+            <AddItem />
           </AdminRoute>
         ),
       },

@@ -2,7 +2,6 @@ import SectionHeading from "../../../components/SectionHeading";
 import SectionMaxWidth from "../../../components/SectionMaxWidth";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-import { useEffect, useState } from "react";
 import { Rating, RoundedStar } from "@smastrom/react-rating";
 import "swiper/css/navigation";
 import "@smastrom/react-rating/style.css";

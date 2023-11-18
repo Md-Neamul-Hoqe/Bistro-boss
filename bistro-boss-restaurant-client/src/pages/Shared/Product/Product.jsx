@@ -2,17 +2,17 @@ import PropTypes from "prop-types";
 import Button from "../../../components/Button";
 import Swal from "sweetalert2";
 import useAuth from "../../../Hooks/useAuth";
-import { useLoaderData, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useAxiosHook from "../../../Hooks/useAxiosHook";
 import useCart from "../../../Hooks/useCart";
 
 const Product = ({ isPrice, item }) => {
   const axios = useAxiosHook();
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLoaderData();
   const [, refetch] = useCart();
-  // console.log(isPrice, item);
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleAddToCart = (item) => {
     if (!user || !user?.email) {
@@ -25,15 +25,15 @@ const Product = ({ isPrice, item }) => {
         cancelButtonColor: "#d33",
         confirmButtonText: "Log-in",
       }).then((result) => {
-        if (result.isConfirmed) {
+        if (result?.isConfirmed) {
           navigate("/credentials/login", { state: { from: location } });
         }
       });
     } else {
       console.log(item);
       const cartItem = {
-        menuId: item._id,
-        email: user.email,
+        menuId: item?._id,
+        email: user?.email,
       };
 
       axios

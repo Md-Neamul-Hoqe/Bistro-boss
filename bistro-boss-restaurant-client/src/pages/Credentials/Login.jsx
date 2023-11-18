@@ -35,14 +35,17 @@ const Login = () => {
     try {
       userSingIn(email, password)
         .then((res) => {
-          const user = res.user;
+          const { user } = res;
+
           Swal.fire({
             icon: "success",
             title: "Signed in successfully",
             showConfirmButton: false,
-            timer: 1500,
+            timer: 1000,
           });
-          console.log(user);
+
+          console.log(user, from);
+
           return navigate(from, { replace: true });
         })
         .catch((error) => {
@@ -54,23 +57,6 @@ const Login = () => {
 
     console.log(email, password);
   };
-
-  // const handleGoogleSignIn = () => {
-  //   googleSignInUser()
-  //     .then((res) => {
-  //       console.log(res);
-
-  //       Swal.fire({
-  //         icon: "success",
-  //         title: "User profile updated successfully.",
-  //         showConfirmButton: false,
-  //         timer: 1500,
-  //       });
-
-  //       navigate("/");
-  //     })
-  //     .catch((error) => console.log(error));
-  // };
 
   const handleCheckCaptcha = (e) => {
     const user_captcha_value = e.target.value;

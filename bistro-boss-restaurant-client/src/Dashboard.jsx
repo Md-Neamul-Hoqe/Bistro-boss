@@ -16,12 +16,11 @@ import { NavLink, Outlet } from "react-router-dom";
 import useAdmin from "./Hooks/useAdmin";
 
 const Dashboard = () => {
-  // get isAdmin value from the database
-  // const isAdmin = true;
   const [isAdmin] = useAdmin();
+
   return (
-    <div className="flex min-h-screen">
-      <div className="w-64 min-h-full bg-orange-400 capitalize">
+    <section className="flex min-h-screen">
+      <aside className="w-64 min-h-full bg-orange-400 capitalize">
         <ul className="menu p-4">
           {isAdmin ? (
             <>
@@ -32,7 +31,7 @@ const Dashboard = () => {
                 </NavLink>
               </li>
               <li style={{ fontVariantCaps: "small-caps" }}>
-                <NavLink to="/dashboard/add-items">
+                <NavLink to="/dashboard/add-item">
                   <FaUtensils />
                   Add Items
                 </NavLink>
@@ -124,11 +123,11 @@ const Dashboard = () => {
             </NavLink>
           </li>
         </ul>
-      </div>
-      <div className="flex-1 p-8">
+      </aside>
+      <aside className="flex-1 p-8">
         <Outlet />
-      </div>
-    </div>
+      </aside>
+    </section>
   );
 };
 

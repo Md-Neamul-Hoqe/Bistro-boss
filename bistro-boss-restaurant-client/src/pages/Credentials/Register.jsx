@@ -10,8 +10,7 @@ import SocialLogin from "../../components/SocialLogin";
 
 const Register = () => {
   const axiosPublic = useAxiosPublic();
-  const { createUser, updateUserProfileImage } =
-    useContext(AuthContext);
+  const { createUser, updateUserProfileImage } = useContext(AuthContext);
   const {
     register,
     handleSubmit,
@@ -20,28 +19,6 @@ const Register = () => {
   } = useForm();
   const navigate = useNavigate();
 
-  //   const handleRegister = (e) => {
-  //     e.preventDefault();
-  //     const form = new FormData(e.target);
-
-  //     const name = form.get("name");
-  //     const email = form.get("email");
-  //     const password = form.get("password");
-  //     console.log(name);
-
-  //     try {
-  //       userSingIn(email, password).then((res) => {
-  //         const user = res.user;
-
-  //         console.log(user);
-  //       });
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-
-  //     console.log(email, password);
-  //   };
-
   const onSubmitForm = (data) => {
     console.log(data);
     const { email, password, name, photoURL } = data;
@@ -49,19 +26,21 @@ const Register = () => {
     console.log({ email, password, name, photoURL });
 
     createUser(email, password).then((res) => {
-      const loggedUser = res.user;
+      const loggedUser = res?.user;
 
       console.log(loggedUser);
       updateUserProfileImage(email, photoURL)
         .then((res) => {
           console.log(res);
+
           const userInfo = {
-            name: data.name,
-            email: data.email,
+            name: name,
+            email: email,
           };
+
           axiosPublic.post("/users", userInfo).then((res) => {
-            if (res.data.insertedId) {
-              console.log("User created.");
+            if (res?.data?.insertedId) {
+              console.log("User photo updated.");
 
               Swal.fire({
                 icon: "success",
@@ -69,7 +48,9 @@ const Register = () => {
                 showConfirmButton: false,
                 timer: 1500,
               });
+
               reset();
+
               navigate("/");
             } else {
               Swal.fire({
@@ -82,10 +63,9 @@ const Register = () => {
           });
         })
         .catch((error) => console.log(error));
-      console.log(res, loggedUser);
+      // console.log(res, loggedUser);
     });
   };
-
 
   return (
     <aside className="py-5">

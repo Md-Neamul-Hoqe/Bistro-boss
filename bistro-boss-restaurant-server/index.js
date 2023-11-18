@@ -67,6 +67,23 @@ async function run() {
             }
         }
 
+        /* verify admin after verify token */
+        const verifyAdmin = async (req, res, next) => {
+            // const { email } = req?.params;
+            // const token = req?.cookies[ 'bistro-boss-token' ];
+            const { email } = req?.user;
+            console.log(email);
+            const query = { email }
+
+            const theUser = await userCollection.findOne(query)
+            console.log('isAdmin : ', theUser);
+
+            const isAdmin = theUser?.role === 'admin'
+            if (!isAdmin) res.status(403).send({ message: 'Access Forbidden' })
+
+            next();
+        }
+
         const setTokenCookie = async (req, res, next) => {
             const user = req?.body;
 
@@ -90,23 +107,7 @@ async function run() {
             }
         }
 
-        /* verify admin after verify token */
-        const verifyAdmin = async (req, res, next) => {
-            // const { email } = req?.params;
-            // const token = req?.cookies[ 'bistro-boss-token' ];
-            const { email } = req?.user;
-            console.log(email);
-            const query = { email }
-
-            const theUser = await userCollection.findOne(query)
-            console.log('isAdmin : ', theUser);
-
-            const isAdmin = theUser?.role === 'admin'
-            if (!isAdmin) res.status(403).send({ message: 'Access Forbidden' })
-
-            next();
-        }
-
+        /* Create JWT */
         app.post('/auth/jwt', setTokenCookie, (req, res) => {
             try {
                 const token = req[ "bistro-boss-token" ];
@@ -124,8 +125,8 @@ async function run() {
 
         })
 
-        /* clear cookie of logout user */
-        app.post('/user/logout', (req, res) => {
+        /* clear cookie / token of logout user */
+        app.post('/user/logout', (_req, res) => {
             try {
                 console.log('User log out successfully.');
 
@@ -135,11 +136,13 @@ async function run() {
             }
         })
 
-        app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
+        /* Get all users [admin] */
+        app.get('/users', verifyToken, verifyAdmin, async (_req, res) => {
             const result = await userCollection.find().toArray();
             res.send(result)
         })
 
+        /* delete user [admin] */
         app.delete('/users/:id', verifyToken, verifyAdmin, async (req, res) => {
             const { id } = req.params;
             const query = { _id: new ObjectId(id) }
@@ -149,6 +152,7 @@ async function run() {
             res.send(result)
         })
 
+        /* add admin [admin] */
         app.patch('/users/admin/:id', verifyToken, verifyAdmin, async (req, res) => {
             const { id } = req.params;
 
@@ -165,6 +169,7 @@ async function run() {
             return res.send(result)
         })
 
+        /* Check current user is admin */
         app.get('/user/admin/:email', verifyToken, async (req, res) => {
             const { email } = req.params;
 
@@ -181,7 +186,8 @@ async function run() {
             res.send({ admin })
         })
 
-        app.post('/users',verifyToken, async (req, res) => {
+        /* Create user */
+        app.post('/users', async (req, res) => {
             try {
                 const user = req.body;
 
@@ -201,7 +207,7 @@ async function run() {
             }
         })
 
-        app.get('/menu', async (req, res) => {
+        app.get('/menu', async (_req, res) => {
             try {
                 const result = await menuCollection.find().toArray();
 
@@ -212,7 +218,21 @@ async function run() {
             }
         })
 
-        app.get('/reviews', async (req, res) => {
+        app.post('/menu', verifyToken, verifyAdmin, async (req, res) => {
+            try {
+                const item = req.body;
+                const result = await menuCollection.insertOne(item);
+                console.log(result);
+
+                res.send(result)
+
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({ message: error?.message })
+            }
+        })
+
+        app.get('/reviews', async (_req, res) => {
             try {
                 const result = await reviewCollection.find().toArray();
 
@@ -224,7 +244,7 @@ async function run() {
             }
         })
 
-        app.post('/carts',verifyToken, async (req, res) => {
+        app.post('/carts', verifyToken, async (req, res) => {
             try {
                 const carItem = req.body;
 
@@ -251,7 +271,7 @@ async function run() {
             }
         })
 
-        app.get('/carts',verifyToken, async (req, res) => {
+        app.get('/carts', verifyToken, async (req, res) => {
             try {
                 const { email } = req.query
 
@@ -270,7 +290,10 @@ async function run() {
 run().catch(console.dir);
 
 
-app.get('/', (req, res) => {
+
+
+
+app.get('/', (_req, res) => {
     res.send('Bistro Boss App is running');
 })
 

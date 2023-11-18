@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
 const useAxiosHook = () => {
   const { userSignOut } = useAuth();
   const navigate = useNavigate();
-
+  // console.log(location);
   axiosInstance.interceptors.request.use(
     (config) => {
       // console.log("Interceptor: ", config);
@@ -26,11 +26,7 @@ const useAxiosHook = () => {
     async (err) => {
       console.log("response: ", err?.response);
       if (err?.response?.status === 401 || err?.response?.status === 403) {
-        console.error(
-          err?.response?.status,
-          ": ",
-          err?.response?.data?.message
-        );
+        console.error(err?.response?.status, err?.response?.data?.message);
 
         await userSignOut()
           .then((res) => console.log(res))

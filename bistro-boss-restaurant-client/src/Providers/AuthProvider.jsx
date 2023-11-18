@@ -51,9 +51,11 @@ const AuthProvider = ({ children }) => {
         // add token
         const userInfo = { email: currentUser?.email };
         try {
-          axios.post("/auth/jwt", userInfo).then(() => {
-            setLoading(false);
-          });
+          axios
+            .post("/auth/jwt", userInfo, { withCredentials: true })
+            .then(() => {
+              setLoading(false);
+            });
         } catch (error) {
           console.log(error);
         }

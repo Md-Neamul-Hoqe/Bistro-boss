@@ -9,38 +9,50 @@ const SocialLogin = () => {
   const navigate = useNavigate();
   const { googleSignInUser, setError } = useAuth();
 
-  const handleGoogleSignIn = (e) => {
-    e.preventDefault();
+  const handleGoogleSignIn = (event) => {
+    console.log(event.target);
+    // event.preventDefault();
     // console.log("object");
 
     googleSignInUser()
       .then((res) => {
+        console.log(res);
         const userInfo = {
           email: res?.user?.email,
           name: res?.user?.displayName,
         };
-        axios.post("/users", userInfo).then((result) => {
-          // console.log(result);
-          setTimeout(() => {
-            Swal.fire({
-              icon: "success",
-              title: result?.data?.message,
-              showConfirmButton: false,
-              timer: 1500,
-            });
-          }, 1000);
-          navigate("/");
-        });
-        
-        if (!res?.insertedId)
-          Swal.fire({
-            icon: "success",
-            title: "User profile updated successfully.",
-            showConfirmButton: false,
-            timer: 1500,
-          });
 
-        navigate("/");
+        axios
+          .post("/users", userInfo)
+          .then((result) => {
+            // console.log(result);
+
+            result?.data?.message
+              ? setTimeout(() => {
+                  Swal.fire({
+                    icon: "success",
+                    title: result?.data?.message,
+                    showConfirmButton: false,
+                    timer: 1500,
+                  });
+                }, 1000)
+              : !res?.insertedId &&
+                Swal.fire({
+                  icon: "success",
+                  title: "User profile updated successfully.",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+
+            return navigate("/");
+          })
+          .catch((error) =>
+            Swal.fire({
+              icon: "error",
+              title: error?.message,
+              showConfirmButton: true,
+            })
+          );
       })
       .catch((error) => setError(error));
   };
@@ -53,7 +65,7 @@ const SocialLogin = () => {
           <FaFacebookF />
         </Link>
         <Link
-          onClick={() => handleGoogleSignIn(event)}
+          onClick={handleGoogleSignIn}
           className="rounded-full p-3 border border-black text-black hover:opacity-70">
           <FaGoogle />
         </Link>
@@ -61,6 +73,10 @@ const SocialLogin = () => {
           <FaGithub />
         </Link>
       </div>
+      <div className="divider "></div>
+      <Link to="/" className="btn btn-sm bg-orange-600 text-white">
+        Go Home
+      </Link>
     </>
   );
 };

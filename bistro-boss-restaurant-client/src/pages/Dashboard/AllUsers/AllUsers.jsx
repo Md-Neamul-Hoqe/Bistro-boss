@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 
 const AllUsers = () => {
   const axios = useAxiosHook();
+
   const { data: users = [], refetch } = useQuery({
     queryKey: ["all-users"],
     queryFn: async () => {
@@ -91,6 +92,7 @@ const AllUsers = () => {
       }
     });
   };
+  
   return (
     <div>
       <div className="flex justify-evenly my-4">

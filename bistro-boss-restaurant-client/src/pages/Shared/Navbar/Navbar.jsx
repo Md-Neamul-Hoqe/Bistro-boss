@@ -4,10 +4,12 @@ import { AuthContext } from "../../../Providers/AuthProvider";
 import Swal from "sweetalert2";
 import { FaCartPlus } from "react-icons/fa";
 import useCart from "../../../Hooks/useCart";
+import useAdmin from "../../../Hooks/useAdmin";
 
 const Navbar = () => {
   const { user, userSignOut } = useContext(AuthContext);
   const [cart] = useCart();
+  const [isAdmin] = useAdmin();
 
   const handleLogOut = () => {
     Swal.fire({
@@ -48,7 +50,15 @@ const Navbar = () => {
         </NavLink>
       </li>
       <li>
-        <NavLink to="/dashboard" className="uppercase font-extrabold text-lg">
+        <NavLink
+          to={
+            user && isAdmin
+              ? "/dashboard/admin-home"
+              : user
+              ? "/dashboard/user-home"
+              : "/"
+          }
+          className="uppercase font-extrabold text-lg">
           Dashboard
         </NavLink>
       </li>
@@ -68,7 +78,7 @@ const Navbar = () => {
         <Link to="/dashboard/cart" className="indicator">
           <FaCartPlus className="text-3xl" />
           <div className="indicator-item badge-xs badge-secondary rounded-badge">
-            +{cart.length}
+            +{cart?.length}
           </div>
         </Link>
       </li>
