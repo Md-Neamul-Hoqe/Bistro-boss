@@ -1,27 +1,28 @@
-import { useEffect, useState } from "react";
 import useAxiosPublic from "./useAxiosPublic";
+import { useQuery } from "@tanstack/react-query";
 
 const useMenu = (category) => {
   const axios = useAxiosPublic();
-  const [menu, setMenu] = useState([]);
 
-  useEffect(() => {
-    try {
-      axios.get("/menu").then((res) => {
-        // console.log(data);
+  // console.log(category);
+  const {
+    data: menu = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["menu"],
+    queryFn: async () => {
+      const { data } = await axios.get(
+        `/menu/?category=${category ? category : ""}`
+      );
 
-        const recommended = res?.data?.filter(
-          (item) => item.category === category
-        );
+      // console.log(data);
 
-        setMenu(recommended);
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }, [category, axios]);
+      return data ? data : [];
+    },
+  });
 
-  return menu;
+  return [menu, isLoading, refetch];
 };
 
 export default useMenu;

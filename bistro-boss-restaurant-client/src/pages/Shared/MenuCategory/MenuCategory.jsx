@@ -5,7 +5,7 @@ import MenuItem from "../MenuItem/MenuItem";
 import Loading from "../../../components/Loading";
 
 const MenuCategory = ({ category }) => {
-  const menu = useMenu(category);
+  const [menu] = useMenu(category);
   return (
     <SectionMaxWidth>
       {menu?.length ? (

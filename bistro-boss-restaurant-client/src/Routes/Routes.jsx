@@ -14,6 +14,7 @@ import PrivateRoutes from "./PrivateRoutes";
 import AdminHome from "../pages/Dashboard/AdminHome/AdminHome";
 import UserHome from "../pages/Dashboard/UserHome/UserHome";
 import AddItem from "../pages/Dashboard/AddItem/AddItem";
+import ManageItems from "../pages/Dashboard/ManageItems/ManageItems";
 
 export const router = createBrowserRouter([
   {
@@ -103,10 +104,10 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "manage-times",
+        path: "manage-items",
         element: (
           <AdminRoute>
-            <Cart />
+            <ManageItems />
           </AdminRoute>
         ),
       },

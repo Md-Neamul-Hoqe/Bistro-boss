@@ -72,7 +72,7 @@ async function run() {
             // const { email } = req?.params;
             // const token = req?.cookies[ 'bistro-boss-token' ];
             const { email } = req?.user;
-            console.log(email);
+            // console.log(email);
             const query = { email }
 
             const theUser = await userCollection.findOne(query)
@@ -87,7 +87,7 @@ async function run() {
         const setTokenCookie = async (req, res, next) => {
             const user = req?.body;
 
-            console.log(user);
+            // console.log(user);
 
             if (user?.email) {
                 const token = jsonwebtoken.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' })
@@ -102,7 +102,7 @@ async function run() {
 
                     })
                 req[ "bistro-boss-token" ] = token;
-                console.log(req[ "bistro-boss-token" ]);
+                // console.log(req[ "bistro-boss-token" ]);
                 next();
             }
         }
@@ -176,7 +176,7 @@ async function run() {
             if (email !== req?.user?.email) return res.status(403).send({ message: 'Access Forbidden' });
 
             const result = await userCollection.findOne({ email })
-            console.log(result);
+            // console.log(result);
 
             let admin = false;
             if (result?.role) {
@@ -194,7 +194,7 @@ async function run() {
                 const query = { email: user?.email }
                 const existingUser = await userCollection.findOne(query);
 
-                console.log(existingUser);
+                // console.log(existingUser);
 
                 if (existingUser)
                     return res.send({ message: `Welcome back ${existingUser?.name}${existingUser?.role ? ' as ' + existingUser?.role : 'user.'}`, insertedId: null })
@@ -207,10 +207,21 @@ async function run() {
             }
         })
 
-        app.get('/menu', async (_req, res) => {
+        app.get('/menu', async (req, res) => {
             try {
-                const result = await menuCollection.find().toArray();
+                // console.log(req?.query);
 
+                const { category } = req?.query;
+                let query = {};
+                // console.log('menu category: ', category);
+
+                if (category) query = { category }
+
+                // console.log(query);
+
+                const result = await menuCollection.find(query).toArray();
+
+                // console.log(category, ' menu no. :', result?.length);
                 res.send(result)
             } catch (error) {
                 console.log(error);
@@ -226,6 +237,22 @@ async function run() {
 
                 res.send(result)
 
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({ message: error?.message })
+            }
+        })
+
+        app.delete('/menu/:id', verifyToken, verifyAdmin, async (req, res) => {
+            try {
+                const { id } = req.params;
+
+                console.log(id);
+                const result = await cartCollection.deleteOne({ _id: new ObjectId(id) })
+
+                // console.log(result);
+
+                res.send(result)
             } catch (error) {
                 console.log(error);
                 res.status(500).send({ message: error?.message })
@@ -259,10 +286,10 @@ async function run() {
             try {
                 const { id } = req.params;
 
-                console.log(id);
+                // console.log(id);
                 const result = await cartCollection.deleteOne({ menuId: id })
 
-                console.log(result);
+                // console.log(result);
 
                 res.send(result)
             } catch (error) {

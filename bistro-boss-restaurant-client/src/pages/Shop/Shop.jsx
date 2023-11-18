@@ -16,33 +16,12 @@ const Shop = () => {
   // console.log(category);
 
   const [tabIndex, setTabIndex] = useState(categories.indexOf(category));
-
-  // const [category, setCategory] = useState("salad");
-
-  //  if(tabIndex === 0) setProducts(useMenu(''))
-
-  // const [products, setProducts] = useState([]);
-  // switch (tabIndex) {
-  //   case 0:
-  //     setProducts(useMenu("salad"));
-  //     break;
-  //   case 1:
-  //     setProducts("pizza");
-  //     break;
-
-  //   case 2:
-  //     setProducts("pizza");
-  //     break;
-
-  //   default:
-  //     break;
-  // }
-
-  const salad = useMenu("salad");
-  const pizza = useMenu("pizza");
-  const soup = useMenu("soup");
-  const dessert = useMenu("dessert");
-  const drinks = useMenu("drinks");
+  
+  const [salad] = useMenu("salad");
+  const [pizza] = useMenu("pizza");
+  const [soup] = useMenu("soup");
+  const [dessert] = useMenu("dessert");
+  const [drinks] = useMenu("drinks");
 
   // console.log(salad, pizza, soup, dessert, drinks);
   return (
