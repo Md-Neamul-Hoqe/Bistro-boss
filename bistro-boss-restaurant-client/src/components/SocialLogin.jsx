@@ -20,12 +20,19 @@ const SocialLogin = () => {
           name: res?.user?.displayName,
         };
         axios.post("/users", userInfo).then((result) => {
-          console.log(result.data);
+          // console.log(result);
+          setTimeout(() => {
+            Swal.fire({
+              icon: "success",
+              title: result?.data?.message,
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          }, 1000);
           navigate("/");
         });
-
-        console.log(res);
-        if (!res.insertedId)
+        
+        if (!res?.insertedId)
           Swal.fire({
             icon: "success",
             title: "User profile updated successfully.",

@@ -13,10 +13,12 @@ import {
   FaUtensils,
 } from "react-icons/fa";
 import { NavLink, Outlet } from "react-router-dom";
+import useAdmin from "./Hooks/useAdmin";
 
 const Dashboard = () => {
   // get isAdmin value from the database
-  const isAdmin = true;
+  // const isAdmin = true;
+  const [isAdmin] = useAdmin();
   return (
     <div className="flex min-h-screen">
       <div className="w-64 min-h-full bg-orange-400 capitalize">

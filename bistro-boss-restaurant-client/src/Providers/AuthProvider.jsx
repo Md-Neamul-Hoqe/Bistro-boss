@@ -10,13 +10,14 @@ import {
   updateProfile,
 } from "firebase/auth";
 import PropTypes from "prop-types";
-import useAxiosHook from "../Hooks/useAxiosHook";
+// import useAxiosHook from "../Hooks/useAxiosHook";
+import useAxiosPublic from "../Hooks/useAxiosPublic";
 export const AuthContext = createContext(null);
 
 const googleProvider = new GoogleAuthProvider();
 
 const AuthProvider = ({ children }) => {
-  const axios = useAxiosHook();
+  const axios = useAxiosPublic();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,8 +51,7 @@ const AuthProvider = ({ children }) => {
         // add token
         const userInfo = { email: currentUser?.email };
         try {
-          axios.post("/auth/jwt", userInfo).then((res) => {
-            console.log(res?.data);
+          axios.post("/auth/jwt", userInfo).then(() => {
             setLoading(false);
           });
         } catch (error) {
@@ -61,10 +61,10 @@ const AuthProvider = ({ children }) => {
         // remove token
         axios
           .post("/user/logout", currentUser)
-          .then((res) => console.log(res?.data));
+          .then((res) => console.log("is Log Out ? ", res?.data?.success));
       }
 
-      console.log("Current User", currentUser);
+      // console.log("Current User", currentUser);
     });
 
     return () => {

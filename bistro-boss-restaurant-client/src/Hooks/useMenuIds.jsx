@@ -13,6 +13,8 @@ const useMenuIds = (menuItems) => {
       try {
         const res = await axios.get(`/menu`);
 
+        console.log("menu items: ", res);
+        
         if (res?.data) {
           const menuOfIds = res?.data?.filter((item) => {
             if (ids.includes(item._id)) return item;

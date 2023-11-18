@@ -20,56 +20,6 @@ app.use(cookieParser());
 const uri = `mongodb+srv://${process.env.milestone12_USER}:${process.env.milestone12_PASS}@projects.mqfabmq.mongodb.net/${bistroBoss}?retryWrites=true&w=majority`;
 
 
-/* JWT implementation */
-
-const verifyToken = async (req, res, next) => {
-    try {
-        console.log('the token to be verified: ', req?.cookies);
-        const token = req?.cookies?.[ "bistro-boss-token" ];
-
-
-        if (!token) return res.status(401).send({ message: 'Unauthorized access' })
-
-        jsonwebtoken.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-            // console.log(err);
-            if (err) {
-                console.log(err);
-                return res.status(401).send({ message: 'You are not authorized' })
-            }
-
-            console.log(decoded);
-            req.user = decoded;
-            next();
-        })
-    } catch (error) {
-        // console.log(error);
-        res.status(500).send({ message: error?.message || error?.errorText });
-    }
-}
-const setTokenCookie = async (req, res, next) => {
-    const user = req?.body;
-
-    console.log(user);
-
-    if (user?.email) {
-        const token = jsonwebtoken.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' })
-
-        console.log('Token generated: ', token);
-
-        res
-            .cookie('bistro-boss-token', token, {
-                // httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-
-            })
-        req[ "bistro-boss-token" ] = token;
-        console.log(req[ "bistro-boss-token" ]);
-        next();
-    }
-}
-
-
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
     serverApi: {
@@ -89,6 +39,74 @@ async function run() {
 
 
         /* Auth api */
+
+        /* Middleware JWT implementation */
+
+        const verifyToken = async (req, res, next) => {
+            try {
+                // console.log('the token to be verified: ', req?.cookies);
+                const token = req?.cookies?.[ "bistro-boss-token" ];
+
+
+                if (!token) return res.status(401).send({ message: 'Unauthorized access' })
+
+                jsonwebtoken.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+                    // console.log(err);
+                    if (err) {
+                        // console.log(err);
+                        return res.status(401).send({ message: 'You are not authorized' })
+                    }
+
+                    // console.log(decoded);
+                    req.user = decoded;
+                    next();
+                })
+            } catch (error) {
+                // console.log(error);
+                res.status(500).send({ message: error?.message || error?.errorText });
+            }
+        }
+
+        const setTokenCookie = async (req, res, next) => {
+            const user = req?.body;
+
+            console.log(user);
+
+            if (user?.email) {
+                const token = jsonwebtoken.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' })
+
+                console.log('Token generated: ', token);
+
+                res
+                    .cookie('bistro-boss-token', token, {
+                        // httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+
+                    })
+                req[ "bistro-boss-token" ] = token;
+                console.log(req[ "bistro-boss-token" ]);
+                next();
+            }
+        }
+
+        /* verify admin after verify token */
+        const verifyAdmin = async (req, res, next) => {
+            // const { email } = req?.params;
+            // const token = req?.cookies[ 'bistro-boss-token' ];
+            const { email } = req?.user;
+            console.log(email);
+            const query = { email }
+
+            const theUser = await userCollection.findOne(query)
+            console.log('isAdmin : ', theUser);
+
+            const isAdmin = theUser?.role === 'admin'
+            if (!isAdmin) res.status(403).send({ message: 'Access Forbidden' })
+
+            next();
+        }
+
         app.post('/auth/jwt', setTokenCookie, (req, res) => {
             try {
                 const token = req[ "bistro-boss-token" ];
@@ -96,7 +114,9 @@ async function run() {
                 // console.log('The user: ', user);
                 // console.log('token in cookie: ', token);
 
-                if (!token) return res.status(400).send({ success: false, message: 'Cookie set failed' })
+                if (!token) return res.status(400).send({ success: false, message: 'Unknown error occurred' })
+
+                console.log('User sign in successfully.');
                 res.send({ success: true })
             } catch (error) {
                 res.status(500).send({ error: true, message: error.message })
@@ -107,8 +127,7 @@ async function run() {
         /* clear cookie of logout user */
         app.post('/user/logout', (req, res) => {
             try {
-                const user = req.body;
-                console.log('logged out user ', user);
+                console.log('User log out successfully.');
 
                 res.clearCookie('bistro-boss-token', { maxAge: 0 }).send({ success: true })
             } catch (error) {
@@ -116,12 +135,12 @@ async function run() {
             }
         })
 
-        app.get('/users', verifyToken, async (req, res) => {
+        app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
             const result = await userCollection.find().toArray();
             res.send(result)
         })
 
-        app.delete('/users/:id', verifyToken, async (req, res) => {
+        app.delete('/users/:id', verifyToken, verifyAdmin, async (req, res) => {
             const { id } = req.params;
             const query = { _id: new ObjectId(id) }
 
@@ -130,7 +149,7 @@ async function run() {
             res.send(result)
         })
 
-        app.patch('/users/admin/:id', verifyToken, async (req, res) => {
+        app.patch('/users/admin/:id', verifyToken, verifyAdmin, async (req, res) => {
             const { id } = req.params;
 
             const query = { _id: new ObjectId(id) }
@@ -143,19 +162,36 @@ async function run() {
 
             const result = await userCollection.updateOne(query, updatedUser)
 
-            res.send(result)
+            return res.send(result)
         })
 
-        app.post('/users', async (req, res) => {
+        app.get('/user/admin/:email', verifyToken, async (req, res) => {
+            const { email } = req.params;
+
+            if (email !== req?.user?.email) return res.status(403).send({ message: 'Access Forbidden' });
+
+            const result = await userCollection.findOne({ email })
+            console.log(result);
+
+            let admin = false;
+            if (result?.role) {
+                admin = result.role === 'admin'
+            }
+
+            res.send({ admin })
+        })
+
+        app.post('/users',verifyToken, async (req, res) => {
             try {
                 const user = req.body;
-                console.log('logged out user: ', user);
 
                 const query = { email: user?.email }
                 const existingUser = await userCollection.findOne(query);
 
+                console.log(existingUser);
+
                 if (existingUser)
-                    return res.send({ message: 'user already exists', insertedId: null })
+                    return res.send({ message: `Welcome back ${existingUser?.name}${existingUser?.role ? ' as ' + existingUser?.role : 'user.'}`, insertedId: null })
 
 
                 const result = await userCollection.insertOne(user)
@@ -164,8 +200,6 @@ async function run() {
                 res.status(500).send({ error: true, message: error.message })
             }
         })
-
-
 
         app.get('/menu', async (req, res) => {
             try {
@@ -190,7 +224,7 @@ async function run() {
             }
         })
 
-        app.post('/carts', async (req, res) => {
+        app.post('/carts',verifyToken, async (req, res) => {
             try {
                 const carItem = req.body;
 
@@ -217,7 +251,7 @@ async function run() {
             }
         })
 
-        app.get('/carts', async (req, res) => {
+        app.get('/carts',verifyToken, async (req, res) => {
             try {
                 const { email } = req.query
 

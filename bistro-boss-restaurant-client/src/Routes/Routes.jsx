@@ -9,6 +9,7 @@ import Credentials from "../pages/Credentials/Credentials";
 import Dashboard from "../Dashboard";
 import Cart from "../pages/Dashboard/Cart/Cart";
 import AllUsers from "../pages/Dashboard/AllUsers/AllUsers";
+import AdminRoute from "./AdminRoute";
 import PrivateRoutes from "./PrivateRoutes";
 
 export const router = createBrowserRouter([
@@ -50,10 +51,14 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: (
+      <PrivateRoutes>
+        <Dashboard />
+      </PrivateRoutes>
+    ),
     children: [
       {
-        path: "/dashboard/user-home",
+        path: "user-home",
         element: <Cart />,
       },
       {
@@ -77,29 +82,45 @@ export const router = createBrowserRouter([
         element: <Cart />,
       },
 
-      /* Admin Routs */
+      /* Admin Routes */
       {
         path: "admin-home",
-        element: <Cart />,
+        element: (
+          <AdminRoute>
+            <Cart />
+          </AdminRoute>
+        ),
       },
       {
         path: "add-times",
-        element: <Cart />,
+        element: (
+          <AdminRoute>
+            <Cart />
+          </AdminRoute>
+        ),
       },
       {
         path: "manage-times",
-        element: <Cart />,
+        element: (
+          <AdminRoute>
+            <Cart />
+          </AdminRoute>
+        ),
       },
       {
         path: "manage-bookings",
-        element: <Cart />,
+        element: (
+          <AdminRoute>
+            <Cart />
+          </AdminRoute>
+        ),
       },
       {
         path: "all-users",
         element: (
-          <PrivateRoutes>
+          <AdminRoute>
             <AllUsers />
-          </PrivateRoutes>
+          </AdminRoute>
         ),
       },
     ],
