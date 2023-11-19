@@ -3,6 +3,7 @@ import useCart from "../../../Hooks/useCart";
 import useMenuIds from "../../../Hooks/useMenuIds";
 import Swal from "sweetalert2";
 import useAxiosHook from "../../../Hooks/useAxiosHook";
+import { Link } from "react-router-dom";
 
 const Cart = () => {
   const axios = useAxiosHook();
@@ -58,7 +59,9 @@ const Cart = () => {
           Total Price: $
           {totalItems && menu?.reduce((sum, item) => sum + item?.price, 0)}
         </h1>
-        <button className="btn bg-orange-400 text-white">Pay</button>
+        <Link to="/dashboard/payment" className="btn bg-orange-400 text-white">
+          Pay
+        </Link>
       </div>
       <div>
         <div className="overflow-x-auto">
