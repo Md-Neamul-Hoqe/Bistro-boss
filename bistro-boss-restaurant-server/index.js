@@ -229,6 +229,43 @@ async function run() {
             }
         })
 
+        app.get('/menu/:id', async (req, res) => {
+            try {
+                // console.log(req?.query);
+
+                const { id } = req?.params;
+                const query = { _id: new ObjectId(id) }
+
+                console.log(query);
+
+                const result = await menuCollection.findOne(query);
+
+                console.log(result);
+                res.send(result)
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({ message: error?.message })
+            }
+        })
+
+        app.patch('/menu/:id', verifyToken, verifyAdmin, async (req, res) => {
+            const { id } = req.params;
+            const Item = req.body;
+
+            const query = { _id: new ObjectId(id) }
+
+            const updatedItem = {
+                $set: {
+                    ...Item
+                }
+            }
+
+            const result = await userCollection.updateOne(query, updatedItem, { upsert: true })
+
+            console.log(result);
+            return res.send(result)
+        })
+
         app.post('/menu', verifyToken, verifyAdmin, async (req, res) => {
             try {
                 const item = req.body;
@@ -282,6 +319,7 @@ async function run() {
                 res.status(500).send({ message: error?.message })
             }
         })
+
         app.delete('/carts/:id', verifyToken, async (req, res) => {
             try {
                 const { id } = req.params;

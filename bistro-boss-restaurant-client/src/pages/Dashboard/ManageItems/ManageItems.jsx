@@ -3,12 +3,49 @@ import useMenu from "../../../Hooks/useMenu";
 import Loading from "../../../components/Loading";
 import SectionHeading from "../../../components/SectionHeading";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import Swal from "sweetalert2";
+import useAxiosHook from "../../../Hooks/useAxiosHook";
 
 const ManageItems = () => {
-  const [menu, isLoading] = useMenu();
+  const axios = useAxiosHook();
+  const [menu, isLoading, refetch] = useMenu();
 
-  const handleDeleteItem = (id) => {
-    console.log(id);
+  const handleDeleteItem = (item) => {
+    console.log(item);
+    Swal.fire({
+      title: "Are you sure to delete?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "delete",
+    }).then((result) => {
+      if (result?.isConfirmed) {
+        console.log(result);
+        axios.delete(`/menu/${item?._id}`).then((res) => {
+          console.log(res);
+
+          if (res?.data?.deletedCount) {
+            refetch();
+
+            console.log("refetched");
+
+            Swal.fire({
+              icon: "success",
+              title: `${item?.name} is deleted successfully!`,
+              showConfirmButton: false,
+              timer: 2000,
+            });
+          } else
+            Swal.fire({
+              icon: "error",
+              title: `Something wrong`,
+              showConfirmButton: true,
+            });
+        });
+      }
+    });
   };
 
   return (
@@ -49,12 +86,12 @@ const ManageItems = () => {
                           <td>${item?.price}</td>
                           <th className="flex justify-around">
                             <Link
-                              to="/dashboard/add-item"
+                              to={`/dashboard/update-item/${item?._id}`}
                               className="btn bg-orange-700 text-white text-xl">
                               <FaEdit />
                             </Link>
                             <button
-                              onClick={() => handleDeleteItem(item?._id)}
+                              onClick={() => handleDeleteItem(item)}
                               className="btn bg-red-700 text-white text-xl">
                               <FaTrashAlt />
                             </button>
