@@ -16,6 +16,7 @@ import UserHome from "../pages/Dashboard/UserHome/UserHome";
 import AddItem from "../pages/Dashboard/AddItem/AddItem";
 import ManageItems from "../pages/Dashboard/ManageItems/ManageItems";
 import UpdateItem from "../pages/Dashboard/UpdateItem/UpdateItem";
+import ContactUs from "../pages/ContactUs/ContactUs";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: "/",
         element: <Home />,
+      },
+      {
+        path: "contact-us",
+        element: <ContactUs />,
       },
       {
         path: "our-menu",
