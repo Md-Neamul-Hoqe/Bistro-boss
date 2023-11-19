@@ -256,7 +256,7 @@ async function run() {
 
             const updatedItem = {
                 $set: {
-                    ...Item
+                    name: item?.name, category: item?.category, recipe: item?.recipe, image: item?.image, price: item?.price
                 }
             }
 
