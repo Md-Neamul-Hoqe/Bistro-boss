@@ -1,10 +1,15 @@
+import useAuth from "../../../Hooks/useAuth";
 
 const UserHome = () => {
-    return (
-        <div>
-             <h2 className="text-4xl">User Home</h2>
-        </div>
-    );
+  const { user } = useAuth();
+
+  return (
+    <div>
+      <h2 className="text-4xl">
+        Hi! {user?.displayName ? user.displayName : null} Welcome Back
+      </h2>
+    </div>
+  );
 };
 
 export default UserHome;

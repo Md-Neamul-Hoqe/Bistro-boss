@@ -146,15 +146,11 @@ async function run() {
 
 
         /* Payment APIs */
-        // const calculateOrderAmount = (items) => {
-        //     console.log(items);
-        //     return 1400;
-        // };
-
         app.post("/create-payment-intent", async (req, res) => {
             const { price } = req.body;
             // Create a PaymentIntent with the order amount and currency
-            console.log(parseInt(price * 100));
+            // console.log(parseInt(price * 100));
+
             const paymentIntent = await stripe.paymentIntents.create({
                 amount: parseInt(price * 100),
                 currency: "usd",
@@ -165,6 +161,21 @@ async function run() {
                 clientSecret: paymentIntent.client_secret,
             });
         });
+
+        app.get('/payments/:email', verifyToken, async (req, res) => {
+
+            const query = { email: req?.params?.email }
+
+            // console.log(req?.params?.email, req?.user?.email);
+
+            if (req?.params?.email !== req?.user?.email) return res.status(403).send({ message: 'Forbidden access' })
+
+            const paymentResult = await paymentCollection.find(query).toArray();
+
+            // console.log(paymentResult);
+
+            res.send(paymentResult)
+        })
 
         app.post('/payments', async (req, res) => {
             const payment = req.body;
@@ -183,6 +194,33 @@ async function run() {
             const deleteResult = await cartCollection.deleteMany(query)
 
             res.send({ paymentResult, deleteResult })
+        })
+
+        app.get('/admin-stats', verifyToken, verifyAdmin, async (_req, res) => {
+            const users = await userCollection.estimatedDocumentCount();
+            const menuItems = await menuCollection.estimatedDocumentCount();
+            const orders = await paymentCollection.estimatedDocumentCount();
+
+            const aggregateResult = await paymentCollection.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        totalRevenue: {
+                            $sum: '$price'
+                        }
+                    }
+                }
+            ]).toArray();
+
+            const revenue = aggregateResult?.length > 0 ? aggregateResult[ 0 ].totalRevenue : 0
+
+            console.log({
+                users, menuItems, orders, revenue
+            });
+
+            res.send({
+                users, menuItems, orders, revenue
+            })
         })
 
         /* Get all users [admin] */

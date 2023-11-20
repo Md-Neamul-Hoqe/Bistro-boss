@@ -18,6 +18,7 @@ import ManageItems from "../pages/Dashboard/ManageItems/ManageItems";
 import UpdateItem from "../pages/Dashboard/UpdateItem/UpdateItem";
 import ContactUs from "../pages/ContactUs/ContactUs";
 import Payment from "../pages/Dashboard/Payment/Payment";
+import PaymentHistory from "../pages/Dashboard/PaymentHistory/PaymentHistory";
 
 export const router = createBrowserRouter([
   {
@@ -82,7 +83,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "payment-history",
-        element: <Cart />,
+        element: <PaymentHistory />,
       },
       {
         path: "add-review",

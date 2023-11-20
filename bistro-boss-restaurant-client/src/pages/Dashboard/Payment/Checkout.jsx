@@ -5,6 +5,7 @@ import useCart from "../../../Hooks/useCart";
 import useMenuIds from "../../../Hooks/useMenuIds";
 import useAuth from "../../../Hooks/useAuth";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
   const { user } = useAuth();
@@ -18,6 +19,8 @@ const Checkout = () => {
   const elements = useElements();
   const axios = useAxiosHook();
   const totalPrice = menu?.reduce((total, item) => item?.price + total, 0);
+
+  const navigate = useNavigate();
   console.log(totalPrice);
 
   useEffect(() => {
@@ -87,13 +90,18 @@ const Checkout = () => {
         console.log("Payment succeeded: ", res);
         refetch();
 
-        res.data?.paymentResult?.insertedId
-          ? Swal.fire({
-              icon: "success",
-              title: "Payment succeeded",
-              text: "Thanks to order from our site.",
-            })
-          : null;
+        res.data?.paymentResult?.insertedId ? (
+          <>
+            {
+              (Swal.fire({
+                icon: "success",
+                title: "Payment succeeded",
+                text: "Thanks to order from our site.",
+              }),
+              navigate("/dashboard/payment-history"))
+            }
+          </>
+        ) : null;
       }
     }
   };
