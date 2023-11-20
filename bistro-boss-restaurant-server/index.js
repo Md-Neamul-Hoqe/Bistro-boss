@@ -1,19 +1,26 @@
-const bistroBoss = "bistroBossDB";
-
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+require('dotenv').config()
 const express = require('express');
 const cors = require('cors');
 const jsonwebtoken = require('jsonwebtoken');
-require('dotenv').config()
 const cookieParser = require('cookie-parser');
+
+const stripe = require("stripe")(process.env.Payment_SECRET);
+
+/* All require statements must in top portion to access desired components / functions */
+
+const bistroBoss = "bistroBossDB";
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
+console.log('Secret: ', process.env.Payment_SECRET);
 
 const app = express();
+
 
 app.use(cors({
     origin: [ "http://localhost:5173" ],
     credentials: true
 }));
+app.use(express.static("public"));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -36,6 +43,7 @@ async function run() {
         const reviewCollection = db.collection('reviews');
         const userCollection = db.collection('users');
         const cartCollection = db.collection('carts');
+        const paymentCollection = db.collection('payments');
 
 
         /* Auth api */
@@ -134,6 +142,47 @@ async function run() {
             } catch (error) {
                 res.status(500).send({ error: true, message: error.message })
             }
+        })
+
+
+        /* Payment APIs */
+        // const calculateOrderAmount = (items) => {
+        //     console.log(items);
+        //     return 1400;
+        // };
+
+        app.post("/create-payment-intent", async (req, res) => {
+            const { price } = req.body;
+            // Create a PaymentIntent with the order amount and currency
+            console.log(parseInt(price * 100));
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: parseInt(price * 100),
+                currency: "usd",
+                payment_method_types: [ 'card' ],
+            });
+
+            res.send({
+                clientSecret: paymentIntent.client_secret,
+            });
+        });
+
+        app.post('/payments', async (req, res) => {
+            const payment = req.body;
+            console.log(payment);
+
+            const paymentResult = await paymentCollection.insertOne(payment);
+
+            console.log(paymentResult);
+
+            const query = {
+                _id: {
+                    $in: payment.cartIds.map(id => new ObjectId(id))
+                }
+            }
+
+            const deleteResult = await cartCollection.deleteMany(query)
+
+            res.send({ paymentResult, deleteResult })
         })
 
         /* Get all users [admin] */

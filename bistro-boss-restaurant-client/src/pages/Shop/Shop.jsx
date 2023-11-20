@@ -36,7 +36,7 @@ const Shop = () => {
         selectedIndex={tabIndex}
         // selectedTabClassName="activeTab"
         onSelect={(index) => {
-          console.log(index);
+          // console.log(index);
           setTabIndex(index);
         }}>
         <TabList>
