@@ -15,6 +15,7 @@ const Product = ({ isPrice, item }) => {
   const location = useLocation();
 
   const handleAddToCart = (item) => {
+    // console.log(this.preventDefault());
     if (!user || !user?.email) {
       Swal.fire({
         title: "Your are not logged in.",
@@ -30,7 +31,8 @@ const Product = ({ isPrice, item }) => {
         }
       });
     } else {
-      console.log(item);
+      // console.log(item);
+
       const cartItem = {
         menuId: item?._id,
         email: user?.email,
@@ -45,15 +47,13 @@ const Product = ({ isPrice, item }) => {
             icon: "success",
             title: `${item.name} added to your cart`,
             showConfirmButton: false,
-            timer: 2000,
+            timer: 1500,
           });
 
           // to updated the client site cart item count
           refetch();
         })
         .catch((error) => console.log(error));
-
-      navigate("/");
     }
   };
 

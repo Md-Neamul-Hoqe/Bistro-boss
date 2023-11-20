@@ -50,19 +50,6 @@ const Navbar = () => {
         </NavLink>
       </li>
       <li>
-        <NavLink
-          to={
-            user && isAdmin
-              ? "/dashboard/admin-home"
-              : user
-              ? "/dashboard/user-home"
-              : "/"
-          }
-          className="uppercase font-extrabold text-lg">
-          Dashboard
-        </NavLink>
-      </li>
-      <li>
         <NavLink to="/our-menu" className="uppercase font-extrabold text-lg">
           Our Menu
         </NavLink>
@@ -74,14 +61,31 @@ const Navbar = () => {
           Our Shop
         </NavLink>
       </li>
-      <li>
-        <Link to="/dashboard/cart" className="indicator">
-          <FaCartPlus className="text-3xl" />
-          <div className="indicator-item badge-xs badge-secondary rounded-badge">
-            +{cart?.length}
-          </div>
-        </Link>
-      </li>
+      {user || isAdmin ? (
+        <>
+          <li>
+            <NavLink
+              to={
+                user && isAdmin
+                  ? "/dashboard/admin-home"
+                  : "/dashboard/user-home"
+              }
+              className="uppercase font-extrabold text-lg">
+              Dashboard
+            </NavLink>
+          </li>
+          {user ? (
+            <li>
+              <Link to="/dashboard/cart" className="indicator">
+                <FaCartPlus className="text-3xl" />
+                <div className="indicator-item badge-xs badge-secondary rounded-badge">
+                  +{cart?.length}
+                </div>
+              </Link>
+            </li>
+          ) : null}
+        </>
+      ) : null}
     </>
   );
 

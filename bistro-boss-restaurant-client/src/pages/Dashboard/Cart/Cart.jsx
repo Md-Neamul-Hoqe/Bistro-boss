@@ -53,13 +53,16 @@ const Cart = () => {
 
   return (
     <div>
-      <div className="flex justify-evenly">
+      <div className="flex justify-evenly mb-5">
         <h1 className="text-4xl">Total Orders: {totalItems}</h1>
         <h1 className="text-4xl">
           Total Price: $
           {totalItems && menu?.reduce((sum, item) => sum + item?.price, 0)}
         </h1>
-        <Link to="/dashboard/payment" className="btn bg-orange-400 text-white">
+        <Link
+          disabled={!cart?.length}
+          to="/dashboard/payment"
+          className="btn bg-orange-400 text-white">
           Pay
         </Link>
       </div>
