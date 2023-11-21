@@ -11,7 +11,7 @@ const stripe = require("stripe")(process.env.Payment_SECRET);
 const bistroBoss = "bistroBossDB";
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
-console.log('Secret: ', process.env.Payment_SECRET);
+// console.log('Secret: ', process.env.Payment_SECRET);
 
 const app = express();
 
@@ -194,6 +194,43 @@ async function run() {
             const deleteResult = await cartCollection.deleteMany(query)
 
             res.send({ paymentResult, deleteResult })
+        })
+
+        /* aggregate pipeline */
+        app.get('/order-stat', verifyToken, verifyAdmin, async (_req, res) => {
+            // app.get('/order-stat', async (_req, res) => {
+            const result = await paymentCollection.aggregate([
+                { $unwind: '$menuItemIds' },
+                { "$project": { "menuItemId": { "$toObjectId": "$menuItemIds" } } },
+                {
+                    $lookup: {
+                        from: 'menu',
+                        localField: 'menuItemId',
+                        foreignField: '_id',
+                        as: 'menuItems',
+                    }
+                },
+                { $unwind: '$menuItems' },
+                {
+                    $group: {
+                        _id: '$menuItems.category',
+                        quantity: { $sum: 1 },
+                        revenue: { $sum: '$menuItems.price' }
+                    }
+                }, {
+                    $project: {
+                        _id: 0,
+                        category: '$_id',
+                        quantity: '$quantity',
+                        revenue: '$revenue'
+                    }
+                }
+
+            ]).toArray();
+
+            console.log(result[ 0 ]);
+
+            res.send(result)
         })
 
         app.get('/admin-stats', verifyToken, verifyAdmin, async (_req, res) => {
