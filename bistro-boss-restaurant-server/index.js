@@ -84,7 +84,7 @@ async function run() {
             const query = { email }
 
             const theUser = await userCollection.findOne(query)
-                      //console.log('isAdmin : ', theUser);
+            //console.log('isAdmin : ', theUser);
 
             const isAdmin = theUser?.role === 'admin'
             if (!isAdmin) res.status(403).send({ message: 'Access Forbidden' })
@@ -92,6 +92,7 @@ async function run() {
             next();
         }
 
+        console.log(process.env);
         const setTokenCookie = async (req, res, next) => {
             const user = req?.body;
 
@@ -101,13 +102,11 @@ async function run() {
                 const token = jsonwebtoken.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' })
 
                 // console.log('Token generated: ', token);
-
                 res
                     .cookie('bistro-boss-token', token, {
-                        // httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
-                        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: "none",
                     })
                 req[ "bistro-boss-token" ] = token;
                 // console.log(req[ "bistro-boss-token" ]);

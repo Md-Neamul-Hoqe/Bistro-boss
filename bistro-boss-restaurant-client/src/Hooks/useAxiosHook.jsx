@@ -24,7 +24,7 @@ const useAxiosHook = () => {
   axiosInstance.interceptors.response.use(
     (res) => res,
     async (err) => {
-            //console.log("response: ", err);
+      //console.log("response: ", err);
       if (err?.response?.status === 401 || err?.response?.status === 403) {
         console.error(err?.response?.status, err?.response?.data?.message);
 

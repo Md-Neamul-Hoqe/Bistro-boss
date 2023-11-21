@@ -61,8 +61,8 @@ const AuthProvider = ({ children }) => {
         }
       } else {
         // remove token
-        axios.post("/user/logout", currentUser).then((res) => {
-                //console.log("is Log Out ? ", res?.data?.success);
+        axios.post("/user/logout", currentUser).then(() => {
+          //console.log("is Log Out ? ", res?.data?.success);
           setLoading(false);
         });
       }
