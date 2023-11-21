@@ -216,7 +216,9 @@ async function run() {
                         quantity: { $sum: 1 },
                         revenue: { $sum: '$menuItems.price' }
                     }
-                }, {
+                },
+                /* to rename _id key [_id to category] */
+                {
                     $project: {
                         _id: 0,
                         category: '$_id',
