@@ -16,7 +16,7 @@ const SocialLogin = () => {
 
     googleSignInUser()
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         const userInfo = {
           email: res?.user?.email,
           name: res?.user?.displayName,

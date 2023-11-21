@@ -42,8 +42,8 @@ const Product = ({ isPrice, item }) => {
 
       axios
         .post("/carts", cartItem)
-        .then((res) => {
-          console.log(res);
+        .then(() => {
+          // console.log(res);
           Swal.fire({
             position: "center-end",
             icon: "success",

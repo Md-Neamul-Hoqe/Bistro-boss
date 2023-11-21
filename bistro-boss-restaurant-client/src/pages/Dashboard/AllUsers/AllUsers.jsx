@@ -2,12 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import useAxiosHook from "../../../Hooks/useAxiosHook";
 import { FaTrashAlt, FaUsers } from "react-icons/fa";
 import Swal from "sweetalert2";
+import useAuth from "../../../Hooks/useAuth";
 
 const AllUsers = () => {
   const axios = useAxiosHook();
+  const { loading } = useAuth();
 
   const { data: users = [], refetch } = useQuery({
     queryKey: ["all-users"],
+    enabled: !loading,
     queryFn: async () => {
       const res = await axios.get("/users");
       //   console.log(res.data);
@@ -34,7 +37,7 @@ const AllUsers = () => {
           if (res?.data?.deletedCount) {
             refetch();
 
-            console.log("refetched");
+            //console.log("refetched");
 
             Swal.fire({
               icon: "success",
@@ -73,7 +76,7 @@ const AllUsers = () => {
           if (res?.data?.modifiedCount) {
             refetch();
 
-            console.log("refetched");
+            //console.log("refetched");
 
             Swal.fire({
               icon: "success",

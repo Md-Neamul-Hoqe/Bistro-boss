@@ -1,14 +1,17 @@
+import useAuth from "./useAuth";
 import useAxiosHook from "./useAxiosHook";
 import { useQuery } from "@tanstack/react-query";
 
 /* Menu ids from cart */
 const useMenuIds = (menuItems) => {
   const axios = useAxiosHook();
+  const { loading } = useAuth();
   // console.log("Menu items in cart: ", menuItems);
 
   const menuIds = menuItems?.map((item) => item?.menuId);
   const { data: menu = [] } = useQuery({
     queryKey: ["cartMenu", menuItems],
+    enabled: !loading,
     queryFn: async () => {
       try {
         /* TODO: get only cart menus not all menus */
@@ -31,7 +34,7 @@ const useMenuIds = (menuItems) => {
     },
   });
 
-  console.log("The menu in cart: ", menu);
+  //console.log("The menu in cart: ", menu);
   return menu;
 };
 

@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const useMenu = (category) => {
   const axios = useAxiosPublic();
-  const { loading } = useAuth();
+  // const { loading } = useAuth();
 
   // console.log(category);
   const {
@@ -13,7 +13,7 @@ const useMenu = (category) => {
     refetch,
   } = useQuery({
     queryKey: [`menus-${category}`],
-    enabled: !loading,
+    // enabled: !loading,
     queryFn: async () => {
       const { data } = await axios.get(`/menu/?category=${category}`);
 

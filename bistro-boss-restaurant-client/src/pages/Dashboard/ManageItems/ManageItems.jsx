@@ -22,14 +22,14 @@ const ManageItems = () => {
       confirmButtonText: "delete",
     }).then((result) => {
       if (result?.isConfirmed) {
-        console.log(result);
+        // console.log(result);
         axios.delete(`/menu/${item?._id}`).then((res) => {
-          console.log(res);
+          // console.log(res);
 
           if (res?.data?.deletedCount) {
             refetch();
 
-            console.log("refetched");
+            //console.log("refetched");
 
             Swal.fire({
               icon: "success",

@@ -28,7 +28,7 @@ const Checkout = () => {
       axios
         .post("/create-payment-intent", { price: totalPrice })
         .then((res) => {
-          console.log(res?.data?.clientSecret);
+          // console.log(res?.data?.clientSecret);
           setClientSecret(res?.data?.clientSecret);
         });
   }, [axios, totalPrice]);
@@ -42,13 +42,13 @@ const Checkout = () => {
 
     if (card === null) return;
 
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
+    const { error } = await stripe.createPaymentMethod({
       type: "card",
       card,
     });
 
     if (error) {
-      console.log("Error: ", error);
+      console.log(error);
       setError(error?.message);
     } else {
       // console.log("paymentMethod: ", paymentMethod);

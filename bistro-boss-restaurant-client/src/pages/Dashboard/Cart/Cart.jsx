@@ -31,7 +31,7 @@ const Cart = () => {
           if (res?.data?.deletedCount) {
             refetch();
 
-            console.log("refetched");
+            //console.log("refetched");
 
             Swal.fire({
               icon: "success",

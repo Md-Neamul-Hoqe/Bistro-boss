@@ -18,7 +18,7 @@ const Login = () => {
 
   const from = location?.state?.from?.pathname || "/";
 
-  console.log(from);
+  // console.log(from);
 
   useEffect(() => {
     loadCaptchaEnginge(6);
@@ -34,8 +34,8 @@ const Login = () => {
 
     try {
       userSingIn(email, password)
-        .then((res) => {
-          const { user } = res;
+        .then(() => {
+          // const { user } = res;
 
           Swal.fire({
             icon: "success",
@@ -44,7 +44,7 @@ const Login = () => {
             timer: 1000,
           });
 
-          console.log(user, from);
+          // console.log(user, from);
 
           return navigate(from, { replace: true });
         })
@@ -72,7 +72,7 @@ const Login = () => {
       setDisabled(false);
     } else {
       setDisabled(true);
-      console.log("Captcha Does Not Match");
+            //console.log("Captcha Does Not Match");
     }
   };
 

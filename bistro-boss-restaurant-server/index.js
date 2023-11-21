@@ -17,7 +17,7 @@ const app = express();
 
 
 app.use(cors({
-    origin: [ "http://localhost:5173", "https://bistro-boss-mnh.web.app/" ],
+    origin: [ "http://localhost:5173", "https://bistro-boss-mnh.web.app" ],
     credentials: true
 }));
 app.use(express.static("public"));
@@ -84,7 +84,7 @@ async function run() {
             const query = { email }
 
             const theUser = await userCollection.findOne(query)
-            console.log('isAdmin : ', theUser);
+                      //console.log('isAdmin : ', theUser);
 
             const isAdmin = theUser?.role === 'admin'
             if (!isAdmin) res.status(403).send({ message: 'Access Forbidden' })
@@ -100,7 +100,7 @@ async function run() {
             if (user?.email) {
                 const token = jsonwebtoken.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '24h' })
 
-                console.log('Token generated: ', token);
+                // console.log('Token generated: ', token);
 
                 res
                     .cookie('bistro-boss-token', token, {
@@ -125,7 +125,7 @@ async function run() {
 
                 if (!token) return res.status(400).send({ success: false, message: 'Unknown error occurred' })
 
-                console.log('User sign in successfully.');
+                //console.log('User sign in successfully.');
                 res.send({ success: true })
             } catch (error) {
                 res.status(500).send({ error: true, message: error.message })
@@ -136,7 +136,7 @@ async function run() {
         /* clear cookie / token of logout user */
         app.post('/user/logout', (_req, res) => {
             try {
-                console.log('User log out successfully.');
+                //console.log('User log out successfully.');
 
                 res.clearCookie('bistro-boss-token', { maxAge: 0 }).send({ success: true })
             } catch (error) {
@@ -357,7 +357,7 @@ async function run() {
 
                 const { category } = req?.query;
                 let query = {};
-                console.log('menu category: ', category);
+                //console.log('menu category: ', category);
 
                 if (category) query = { category }
 

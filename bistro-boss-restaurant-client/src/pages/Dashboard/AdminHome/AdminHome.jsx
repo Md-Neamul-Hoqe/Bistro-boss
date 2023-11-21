@@ -18,11 +18,12 @@ const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const AdminHome = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const axios = useAxiosHook();
 
   const { data: stats = {} } = useQuery({
     queryKey: ["admin-stats"],
+    enabled: !loading,
     queryFn: async () => {
       const res = await axios.get("/admin-stats");
       return res?.data;
@@ -31,6 +32,7 @@ const AdminHome = () => {
 
   const { data: chartData } = useQuery({
     queryKey: ["order-stats"],
+    enabled: !loading,
     queryFn: async () => {
       const res = await axios.get("/order-stats");
       return res?.data || [];
@@ -161,7 +163,7 @@ const AdminHome = () => {
 
         <div className="flex-1">
           <PieChart width={400} height={400}>
-            <Legend/>
+            <Legend />
             <Pie
               data={pieChartData}
               cx="50%"

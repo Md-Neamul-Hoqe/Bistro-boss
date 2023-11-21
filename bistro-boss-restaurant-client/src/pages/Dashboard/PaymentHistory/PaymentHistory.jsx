@@ -4,11 +4,12 @@ import SectionHeading from "../../../components/SectionHeading";
 import useAxiosHook from "../../../Hooks/useAxiosHook";
 
 const PaymentHistory = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const axios = useAxiosHook();
 
   const { data: payments = [] } = useQuery({
     queryKey: ["payments", user?.email],
+    enabled: !loading,
     queryFn: async () => {
       const response = await axios.get(`/payments/${user?.email}`);
       return response?.data || [];

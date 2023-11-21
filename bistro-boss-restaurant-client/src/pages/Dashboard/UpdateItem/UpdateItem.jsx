@@ -36,7 +36,7 @@ const UpdateItem = () => {
       },
     });
 
-    console.log("image uploaded: ", data?.data?.display_url);
+             //console.log("image uploaded: ", data?.data?.display_url);
     console.log(data);
 
     if (data?.success) {
