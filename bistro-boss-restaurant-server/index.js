@@ -17,7 +17,7 @@ const app = express();
 
 
 app.use(cors({
-    origin: [ "http://localhost:5173" ],
+    origin: [ "http://localhost:5173", "https://bistro-boss-mnh.web.app/" ],
     credentials: true
 }));
 app.use(express.static("public"));
