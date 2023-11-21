@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 /* Menu ids from cart */
 const useMenuIds = (menuItems) => {
   const axios = useAxiosHook();
-  console.log("Menu items in cart: ", menuItems);
+  // console.log("Menu items in cart: ", menuItems);
 
   const menuIds = menuItems?.map((item) => item?.menuId);
   const { data: menu = [] } = useQuery({
@@ -15,7 +15,7 @@ const useMenuIds = (menuItems) => {
         const res = await axios.get(`/menu`);
 
         if (res?.data?.length) {
-          console.log("menu items: ", menuIds);
+          // console.log("menu items: ", menuIds);
 
           const menuOfIds = res?.data?.filter((item) => {
             if (menuIds.includes(item._id)) return item;

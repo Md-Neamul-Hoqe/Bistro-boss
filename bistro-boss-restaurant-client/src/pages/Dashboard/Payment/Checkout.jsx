@@ -35,7 +35,7 @@ const Checkout = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("submitted");
+    // console.log("submitted");
 
     if (!stripe || !elements) return;
     const card = elements.getElement(CardElement);
@@ -51,7 +51,7 @@ const Checkout = () => {
       console.log("Error: ", error);
       setError(error?.message);
     } else {
-      console.log("paymentMethod: ", paymentMethod);
+      // console.log("paymentMethod: ", paymentMethod);
       setError(null);
     }
 
@@ -70,9 +70,9 @@ const Checkout = () => {
 
     if (confirmError) console.log("confirm error: ", confirmError);
     else {
-      console.log(paymentIntent);
+      // console.log(paymentIntent);
       if (paymentIntent.status === "succeeded") {
-        console.log("Transaction id: ", paymentIntent.id);
+        // console.log("Transaction id: ", paymentIntent.id);
 
         setTransactionID(paymentIntent.id);
 
@@ -87,7 +87,7 @@ const Checkout = () => {
         };
 
         const res = await axios.post("/payments", payment);
-        console.log("Payment succeeded: ", res);
+        // console.log("Payment succeeded: ", res);
         refetch();
 
         res.data?.paymentResult?.insertedId ? (

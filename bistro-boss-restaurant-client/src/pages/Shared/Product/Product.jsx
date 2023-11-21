@@ -11,6 +11,8 @@ const Product = ({ isPrice, item }) => {
   const { user } = useAuth();
   const [, refetch] = useCart();
 
+  // console.log(item, isPrice);
+
   const navigate = useNavigate();
   const location = useLocation();
 

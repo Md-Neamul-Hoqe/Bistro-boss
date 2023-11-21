@@ -23,7 +23,7 @@ const Shop = () => {
   const [dessert] = useMenu("dessert");
   const [drinks] = useMenu("drinks");
 
-  // console.log(salad, pizza, soup, dessert, drinks);
+  console.log(salad, pizza, soup, dessert, drinks);
   return (
     <div>
       <Cover

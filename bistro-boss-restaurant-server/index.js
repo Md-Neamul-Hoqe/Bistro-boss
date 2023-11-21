@@ -197,7 +197,7 @@ async function run() {
         })
 
         /* aggregate pipeline */
-        app.get('/order-stat', verifyToken, verifyAdmin, async (_req, res) => {
+        app.get('/order-stats', verifyToken, verifyAdmin, async (_req, res) => {
             // app.get('/order-stat', async (_req, res) => {
             const result = await paymentCollection.aggregate([
                 { $unwind: '$menuItemIds' },
@@ -234,30 +234,35 @@ async function run() {
         })
 
         app.get('/admin-stats', verifyToken, verifyAdmin, async (_req, res) => {
-            const users = await userCollection.estimatedDocumentCount();
-            const menuItems = await menuCollection.estimatedDocumentCount();
-            const orders = await paymentCollection.estimatedDocumentCount();
+            try {
+                const users = await userCollection.estimatedDocumentCount();
+                const menuItems = await menuCollection.estimatedDocumentCount();
+                const orders = await paymentCollection.estimatedDocumentCount();
 
-            const aggregateResult = await paymentCollection.aggregate([
-                {
-                    $group: {
-                        _id: null,
-                        totalRevenue: {
-                            $sum: '$price'
+                const aggregateResult = await paymentCollection.aggregate([
+                    {
+                        $group: {
+                            _id: null,
+                            totalRevenue: {
+                                $sum: '$price'
+                            }
                         }
                     }
-                }
-            ]).toArray();
+                ]).toArray();
 
-            const revenue = aggregateResult?.length > 0 ? aggregateResult[ 0 ].totalRevenue : 0
+                const revenue = aggregateResult?.length > 0 ? aggregateResult[ 0 ].totalRevenue : 0
 
-            console.log({
-                users, menuItems, orders, revenue
-            });
+                console.log({
+                    users, menuItems, orders, revenue
+                });
 
-            res.send({
-                users, menuItems, orders, revenue
-            })
+                res.send({
+                    users, menuItems, orders, revenue
+                })
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({ message: error?.message })
+            }
         })
 
         /* Get all users [admin] */
@@ -268,46 +273,61 @@ async function run() {
 
         /* delete user [admin] */
         app.delete('/users/:id', verifyToken, verifyAdmin, async (req, res) => {
-            const { id } = req.params;
-            const query = { _id: new ObjectId(id) }
+            try {
+                const { id } = req.params;
+                const query = { _id: new ObjectId(id) }
 
-            const result = await userCollection.deleteOne(query)
+                const result = await userCollection.deleteOne(query)
 
-            res.send(result)
+                res.send(result)
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({ message: error?.message })
+            }
         })
 
         /* add admin [admin] */
         app.patch('/users/admin/:id', verifyToken, verifyAdmin, async (req, res) => {
-            const { id } = req.params;
+            try {
+                const { id } = req.params;
 
-            const query = { _id: new ObjectId(id) }
+                const query = { _id: new ObjectId(id) }
 
-            const updatedUser = {
-                $set: {
-                    role: 'admin'
+                const updatedUser = {
+                    $set: {
+                        role: 'admin'
+                    }
                 }
+
+                const result = await userCollection.updateOne(query, updatedUser)
+
+                return res.send(result)
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({ message: error?.message })
             }
-
-            const result = await userCollection.updateOne(query, updatedUser)
-
-            return res.send(result)
         })
 
         /* Check current user is admin */
         app.get('/user/admin/:email', verifyToken, async (req, res) => {
-            const { email } = req.params;
+            try {
+                const { email } = req.params;
 
-            if (email !== req?.user?.email) return res.status(403).send({ message: 'Access Forbidden' });
+                if (email !== req?.user?.email) return res.status(403).send({ message: 'Access Forbidden' });
 
-            const result = await userCollection.findOne({ email })
-            // console.log(result);
+                const result = await userCollection.findOne({ email })
+                // console.log(result);
 
-            let admin = false;
-            if (result?.role) {
-                admin = result.role === 'admin'
+                let admin = false;
+                if (result?.role) {
+                    admin = result.role === 'admin'
+                }
+
+                res.send({ admin })
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({ message: error?.message })
             }
-
-            res.send({ admin })
         })
 
         /* Create user */
@@ -337,7 +357,7 @@ async function run() {
 
                 const { category } = req?.query;
                 let query = {};
-                // console.log('menu category: ', category);
+                console.log('menu category: ', category);
 
                 if (category) query = { category }
 
@@ -345,7 +365,7 @@ async function run() {
 
                 const result = await menuCollection.find(query).toArray();
 
-                // console.log(category, ' menu no. :', result?.length);
+                console.log(category, ' menu no. :', result?.length);
                 res.send(result)
             } catch (error) {
                 console.log(error);
@@ -373,21 +393,26 @@ async function run() {
         })
 
         app.patch('/menu/:id', verifyToken, verifyAdmin, async (req, res) => {
-            const { id } = req.params;
-            const Item = req.body;
+            try {
+                const { id } = req.params;
+                const item = req.body;
 
-            const query = { _id: new ObjectId(id) }
+                const query = { _id: new ObjectId(id) }
 
-            const updatedItem = {
-                $set: {
-                    name: item?.name, category: item?.category, recipe: item?.recipe, image: item?.image, price: item?.price
+                const updatedItem = {
+                    $set: {
+                        name: item?.name, category: item?.category, recipe: item?.recipe, image: item?.image, price: item?.price
+                    }
                 }
+
+                const result = await userCollection.updateOne(query, updatedItem, { upsert: true })
+
+                console.log(result);
+                return res.send(result)
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({ message: error?.message })
             }
-
-            const result = await userCollection.updateOne(query, updatedItem, { upsert: true })
-
-            console.log(result);
-            return res.send(result)
         })
 
         app.post('/menu', verifyToken, verifyAdmin, async (req, res) => {
